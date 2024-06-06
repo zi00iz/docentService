@@ -1,4 +1,3 @@
-// app.js
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
@@ -11,8 +10,8 @@ const app = express();
 
 app.set('port', process.env.PORT || 8000);
 
-// EJS 설정 (views 폴더 대신 public 폴더 사용)
-app.set('views', path.join(__dirname, 'public'));
+// EJS 설정
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(morgan('dev'));

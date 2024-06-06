@@ -127,6 +127,11 @@ body {
     text-align: center;
 }
 
+.popup-content img {
+    max-width: 100%; /* 이미지 크기를 팝업 크기에 맞추기 */
+    height: auto;
+}
+
 .close-button {
     color: #aaa;
     float: right;

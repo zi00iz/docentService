@@ -31,6 +31,9 @@ artdb_config = {
     'database': os.getenv('DB_NAME_ART')
 }
 
+#팀원 config
+Y_HOST = os.getenv('Y_HOST')
+
 class ArtIDRequest(BaseModel):
     art_id: int
 
@@ -42,6 +45,9 @@ class ArtInfoResponse(BaseModel):
 
 class SaveImgRequest(BaseModel):
     user_img_url: str
+
+class ArtConfirmationRequest(BaseModel):
+    art_id: int
 
 # S3 configuration
 s3 = boto3.client('s3',
@@ -201,24 +207,23 @@ async def find_similar_art(file: UploadFile = File(...)):
         print(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-#팀원에게 ArtId 보내주기
-@app.post("/postArtInfo", response_model=ArtInfoResponse)
-def post_art_info(art_id_request: ArtIDRequest):
+#유사한 작품의 art_id를 팀원에게 보내기
+@app.post("/postArtInfo")
+async def post_art_info(request: ArtConfirmationRequest):
     try:
-        conn = mysql.connector.connect(**artdb_config)
-        cursor = conn.cursor(dictionary=True)
-        query = "SELECT art_id, art_name, art_artist, art_img_url FROM art_info WHERE art_id = %s"
-        cursor.execute(query, (art_id_request.art_id,))
-        result = cursor.fetchone()
-        cursor.close()
-        conn.close()
-        if result:
-            return result
-        else:
-            raise HTTPException(status_code=404, detail="Art not found")
-    except mysql.connector.Error as err:
-        print(f"Database connection failed: {err}")
-        raise HTTPException(status_code=500, detail="Database connection failed")
+        art_id = request.art_id
+        data = {'art_id': art_id}
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(Y_HOST, json=data) as response:
+                if response.status == 200:
+                    return {"success": True, "message": "Art ID sent successfully"}
+                else:
+                    return {"success": False, "message": "Failed to send Art ID"}
+
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

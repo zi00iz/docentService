@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="header">
-        <h2 class="logo-text">My Docent</h2>
+        <h1 class="logo-text">My Docent</h1>
     </div>
     <div class="container">
         <div class="history">
@@ -18,6 +18,7 @@
         <div class="main">
             <div class="buttons">
                 <button onclick="document.getElementById('file-upload').click();">사진 업로드</button>
+                <input type="file" id="file-upload" style="display: none;" onchange="previewFile()">
                 <button onclick="uploadToS3()">작품 찾기</button>
             </div>
             <div class="upload-area">
@@ -94,7 +95,7 @@
         }
 
         function confirmArt() {
-            alert('작품이 확인되었습니다!');
+            alert('작품이 확인되었습니다! 도슨트의 안내가 시작됩니다!');
             closePopup();
         }
     </script>
