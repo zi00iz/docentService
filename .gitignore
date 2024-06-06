@@ -1,0 +1,22 @@
+# .env
+.env
+
+.vscode
+
+## maven
+maven/**/target
+
+docker/**/Makefile
+docker/**/Dockerfile
+docker/**
+
+##nodejs
+node/**/node_modules
+node/**/package-lock.json
+node/**/package.json
+
+##python
+python/**/Makefile
+python/**/__pycache__/
+python/**/secret.json
+python/**/*.png

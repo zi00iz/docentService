@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Docent</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="header">
+        <h2 class="logo-text">My Docent</h2>
+    </div>
+    <div class="container">
+        <div class="history">
+            <h2>History</h2>
+            <button class="clear-button">모든 기록 지우기</button>
+        </div>
+        <div class="main">
+            <div class="buttons">
+                <button onclick="document.getElementById('file-upload').click();">사진 업로드</button>
+                <button onclick="uploadToS3()">작품 찾기</button>
+            </div>
+            <div class="upload-area">
+                <div class="upload-icon">
+                    <img src="" alt="Upload Icon" id="upload-preview">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close-button" onclick="closePopup()">&times;</span>
+            <p>이 작품이 맞나요?</p>
+            <img id="similar-art" src="" alt="Similar Art">
+            <button onclick="confirmArt()">예</button>
+            <button onclick="closePopup()">아니요</button>
+        </div>
+    </div>
+
+    <script>
+        function previewFile() {
+            const preview = document.getElementById('upload-preview');
+            const file = document.getElementById('file-upload').files[0];
+            const reader = new FileReader();
+
+            reader.addEventListener('load', () => {
+                preview.src = reader.result;
+            }, false);
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function uploadToS3() {
+            const file = document.getElementById('file-upload').files[0];
+            if (!file) {
+                alert('파일을 선택하세요.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showPopup(data.similarArt.art_img_url);
+                } else {
+                    alert('파일 업로드에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('파일 업로드 중 오류가 발생했습니다.');
+            });
+        }
+
+        function showPopup(imgUrl) {
+            const popup = document.getElementById('popup');
+            const similarArtImg = document.getElementById('similar-art');
+            similarArtImg.src = imgUrl;
+            popup.style.display = 'block';
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('popup');
+            popup.style.display = 'none';
+        }
+
+        function confirmArt() {
+            alert('작품이 확인되었습니다!');
+            closePopup();
+        }
+    </script>
+</body>
+</html>

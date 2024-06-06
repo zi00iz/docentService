@@ -1,2 +1,0 @@
-# docentService
-VisionProject_DocentService
