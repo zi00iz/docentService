@@ -12,6 +12,7 @@ import urllib.parse
 from typing import Optional
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+import aiohttp
 
 load_dotenv()
 app = FastAPI()

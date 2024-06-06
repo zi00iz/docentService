@@ -54,14 +54,12 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
         console.log('File uploaded successfully:', data);
 
-        // 이미지 URL을 FastAPI 서버로 전송
         try {
             const saveResponse = await axios.post(`${MY_HOST}/saveUserImg`, {
                 user_img_url: data.Location
             });
 
             if (saveResponse.data.success) {
-                // 유사한 이미지를 찾는 API 호출
                 const formData = new FormData();
                 formData.append('file', file.buffer, {
                     filename: originalName,
@@ -83,6 +81,51 @@ router.post('/upload', upload.single('file'), async (req, res) => {
             res.status(500).json({ success: false, error: 'Failed to find similar art' });
         }
     });
+});
+
+router.post('/confirmArt', async (req, res) => {
+    const { art_id } = req.body;
+
+    try {
+        const response = await axios.post(`${MY_HOST}/postArtInfo`, { art_id });
+        if (response.data.success) {
+            res.status(200).json({ success: true });
+        } else {
+            res.status(500).json({ success: false, error: 'Failed to confirm art' });
+        }
+    } catch (error) {
+        console.error('Error confirming art:', error);
+        res.status(500).json({ success: false, error: 'Failed to confirm art' });
+    }
+});
+
+router.post('/retrySimilarArt', upload.single('file'), async (req, res) => {
+    const file = req.file;
+
+    if (!file) {
+        console.error('No file received.');
+        return res.status(400).json({ success: false, error: 'No file received.' });
+    }
+
+    const originalName = file.originalname;
+    const formData = new FormData();
+    formData.append('file', file.buffer, {
+        filename: originalName,
+        contentType: file.mimetype
+    });
+
+    try {
+        const similarityResponse = await axios.post(`${MY_HOST}/findSimilarArt`, formData, {
+            headers: {
+                ...formData.getHeaders()
+            }
+        });
+
+        res.status(200).json({ success: true, similarArt: similarityResponse.data });
+    } catch (error) {
+        console.error('Error finding similar art:', error);
+        res.status(500).json({ success: false, error: 'Failed to find similar art' });
+    }
 });
 
 module.exports = router;
