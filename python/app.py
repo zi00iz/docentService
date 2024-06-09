@@ -213,18 +213,31 @@ async def find_similar_art(file: UploadFile = File(...)):
 async def post_art_info(request: ArtConfirmationRequest):
     try:
         art_id = request.art_id
-        data = {'art_id': art_id}
-
-        async with aiohttp.ClientSession() as session:
-            async with session.post(FASTAPI_URL2, json=data) as response:
-                if response.status == 200:
-                    return {"success": True, "message": "Art ID sent successfully"}
-                else:
-                    return {"success": False, "message": "Failed to send Art ID"}
-
+        return {"success": True, "message": "Art ID received", "art_id": art_id}
     except Exception as e:
         print(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# @app.get("/get-art-info/{art_id}", response_model=ArtInfoResponse)
+# async def get_art_info(art_id: int):
+#     try:
+#         conn = mysql.connector.connect(**artdb_config)
+#         cursor = conn.cursor(dictionary=True)
+#         cursor.execute("SELECT art_id, art_name, art_artist, art_img_url FROM art_info WHERE art_id = %s", (art_id,))
+#         art_info = cursor.fetchone()
+#         cursor.close()
+#         conn.close()
+
+#         if art_info:
+#             return art_info
+#         else:
+#             raise HTTPException(status_code=404, detail="Art ID not found")
+#     except mysql.connector.Error as err:
+#         print(f"Database connection failed: {err}")
+#         raise HTTPException(status_code=500, detail="Database connection failed")
+#     except Exception as e:
+#         print(f"Unexpected error: {e}")
+#         raise HTTPException(status_code=500, detail=str(e))
 
 # 팀원이 art_id를 요청하면 MySQL 데이터베이스로부터 정보를 반환하는 API
 @app.post("/requestArtID", response_model=ArtInfoResponse)

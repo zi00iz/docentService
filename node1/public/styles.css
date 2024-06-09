@@ -33,7 +33,7 @@ body {
 }
 
 .history {
-    width: 25%;
+    width: 20%;
     background-color: #D4B48C;
     padding: 20px;
     box-sizing: border-box;
@@ -82,6 +82,7 @@ body {
     padding: 10px 20px;
     margin-right: 10px; /* 버튼들 간의 간격 추가 */
     cursor: pointer;
+    border-radius: 8px; /* 모서리를 둥글게 */
 }
 
 .buttons button:hover {
@@ -89,13 +90,14 @@ body {
 }
 
 .upload-area {
-    width: 500px;
-    height: 500px;
+    width: 400px; /* 업로드 박스 크기 줄이기 */
+    height: 400px; /* 업로드 박스 크기 줄이기 */
     border: 2px dashed #AAA;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden; /* 이미지가 박스 밖으로 나가지 않도록 */
+    margin-bottom: 20px; /* 아래 간격 추가 */
 }
 
 .upload-icon img {
@@ -144,4 +146,27 @@ body {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+.artwork {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.artwork img {
+    max-width: 30%;
+    height: auto;
+    margin-right: 20px;
+}
+
+.description {
+    flex: 1;
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: 500%; /* 텍스트 박스 너비를 5배로 설정 */
+    height: 200px;
+    box-sizing: border-box;
 }

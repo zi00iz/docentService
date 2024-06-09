@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const AWS = require('aws-sdk');
 const axios = require('axios');
-require("dotenv").config({ path: "../.env" });
+require("dotenv").config({ path: ".env" });
 const FormData = require('form-data');
 
 router.use(bodyParser.json());
@@ -89,7 +89,7 @@ router.post('/confirmArt', async (req, res) => {
     try {
         const response = await axios.post(`${FASTAPI_URL1}/postArtInfo`, { art_id });
         if (response.data.success) {
-            res.status(200).json({ success: true });
+            res.status(200).json({ success: true, art_id: art_id }); // art_id 반환
         } else {
             res.status(500).json({ success: false, error: 'Failed to confirm art' });
         }

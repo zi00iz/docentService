@@ -42,6 +42,7 @@
     <script>
         let currentArtId = null;
         let uploadedFile = null;
+        var newPort = 3000; // 이동하려는 포트 번호를 지정합니다.
 
         function previewFile() {
             const preview = document.getElementById('upload-preview');
@@ -100,30 +101,29 @@
         }
 
         function confirmArt() {
-            if (currentArtId) {
-                fetch('/confirmArt', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ art_id: currentArtId })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('작품이 확인되었습니다! 도슨트의 안내가 시작됩니다!');
-                        document.getElementById('upload-preview').src = document.getElementById('similar-art').src;
-                        currentArtId = null;
-                    } else {
-                        alert('작품 확인에 실패했습니다.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('작품 확인 중 오류가 발생했습니다.');
-                });
-            }
-            closePopup();
+        if (currentArtId) {
+            fetch('/confirmArt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ art_id: currentArtId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('작품이 확인되었습니다! 도슨트의 안내가 시작됩니다!');
+                    window.location.href = window.location.protocol + "//" + window.location.hostname + ":" + newPort + "/?art_id=" + currentArtId;
+                } else {
+                    alert('작품 확인에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('작품 확인 중 오류가 발생했습니다.');
+            });
+        }
+        closePopup();
         }
 
         function retrySimilarArt() {
