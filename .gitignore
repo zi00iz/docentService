@@ -15,6 +15,9 @@ node1/**/node_modules
 node1/**/package-lock.json
 node1/**/package.json
 
+node
+node/*
+
 ##python
 python/**/Makefile
 python/**/__pycache__/
