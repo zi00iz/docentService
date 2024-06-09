@@ -10,10 +10,16 @@ docker/**/Makefile
 docker/**/Dockerfile
 docker/**
 
-##nodejs
-node/**/node_modules
-node/**/package-lock.json
-node/**/package.json
+##nodejs1
+node1/**/node_modules
+node1/**/package-lock.json
+node1/**/package.json
+
+##nodejs2
+node2/**/node_modules
+node2/**/package-lock.json
+node2/**/package.json
+node2/*
 
 ##python
 python/**/Makefile

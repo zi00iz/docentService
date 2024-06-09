@@ -36,7 +36,7 @@ const main = require('./routes/main.js');
 app.use('/', main);
 
 app.listen(app.get('port'), () => {
-    const dir = './uploadUserImg';
+    const dir = './saveUserImg';
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
     console.log(`${app.get('port')} Port: Server Started~!!`);
 });

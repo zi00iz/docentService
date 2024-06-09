@@ -32,8 +32,8 @@ artdb_config = {
     'database': os.getenv('DB_NAME_ART')
 }
 
-#팀원 config
-Y_HOST = os.getenv('Y_HOST')
+# 팀원 config
+FASTAPI_URL2 = os.getenv('FASTAPI_URL2')
 
 class ArtIDRequest(BaseModel):
     art_id: int
@@ -52,8 +52,8 @@ class ArtConfirmationRequest(BaseModel):
 
 # S3 configuration
 s3 = boto3.client('s3',
-                  aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-                  aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+                  aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID_1'),
+                  aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY_1'),
                   region_name=os.getenv('AWS_REGION'))
 BUCKET_NAME = os.getenv('AWS_S3_BUCKET_NAME')
 
@@ -125,7 +125,7 @@ async def compare_images(uploaded_image, art_images):
             best_kp1, best_kp2, best_matches = kp1, kp2, matches
 
     return most_similar_art, best_kp1, best_kp2, best_matches
-    
+
 # 사용자가 입력한 이미지의 S3 객체 주소와 이미지ID를 DB_NAME_USER에 저장하기
 @app.post("/saveUserImg")
 async def saveUserImg(request: SaveImgRequest):
@@ -181,7 +181,7 @@ async def s3_to_sql():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-#유사도 체크하는 api
+# 유사도 체크하는 api
 @app.post("/findSimilarArt", response_model=ArtInfoResponse)
 async def find_similar_art(file: UploadFile = File(...)):
     try:
@@ -208,7 +208,7 @@ async def find_similar_art(file: UploadFile = File(...)):
         print(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-#유사한 작품의 art_id를 팀원에게 보내기
+# 유사한 작품의 art_id를 팀원에게 보내기
 @app.post("/postArtInfo")
 async def post_art_info(request: ArtConfirmationRequest):
     try:
@@ -216,12 +216,44 @@ async def post_art_info(request: ArtConfirmationRequest):
         data = {'art_id': art_id}
 
         async with aiohttp.ClientSession() as session:
-            async with session.post(Y_HOST, json=data) as response:
+            async with session.post(FASTAPI_URL2, json=data) as response:
                 if response.status == 200:
                     return {"success": True, "message": "Art ID sent successfully"}
                 else:
                     return {"success": False, "message": "Failed to send Art ID"}
 
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# 팀원이 art_id를 요청하면 MySQL 데이터베이스로부터 정보를 반환하는 API
+@app.post("/requestArtID", response_model=ArtInfoResponse)
+async def request_art_id(request: ArtConfirmationRequest):
+    try:
+        art_id = request.art_id
+
+        conn = mysql.connector.connect(**artdb_config)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT art_id, art_name, art_artist, art_img_url FROM art_info WHERE art_id = %s", (art_id,))
+        art_info = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if art_info:
+            # 모델을 사용하여 응답을 생성합니다.
+            response = ArtInfoResponse(
+                art_id=art_info['art_id'],
+                art_name=art_info['art_name'],
+                art_artist=art_info['art_artist'],
+                art_img_url=art_info['art_img_url']
+            )
+            return response
+        else:
+            raise HTTPException(status_code=404, detail="Art ID not found")
+
+    except mysql.connector.Error as err:
+        print(f"Database connection failed: {err}")
+        raise HTTPException(status_code=500, detail="Database connection failed")
     except Exception as e:
         print(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
